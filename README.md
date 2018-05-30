@@ -69,7 +69,7 @@ const express = require('express')
 const {makeFindById} = require('mkres')
 
 const app = express()
-const router = express.router()
+const router = express.Router()
 
 makeFindById({
     router: router,
@@ -86,7 +86,7 @@ const express = require('express')
 const {makeFind} = require('mkres')
 
 const app = express()
-const router = express.router()
+const router = express.Router()
 
 makeFind({
     router: router,
@@ -105,7 +105,7 @@ const express = require('express')
 const {makeCreate} = require('mkres')
 
 const app = express()
-const router = express.router()
+const router = express.Router()
 
 makeCreate({
     router: router,
@@ -125,7 +125,7 @@ const express = require('express')
 const {makeUpdate} = require('mkres')
 
 const app = express()
-const router = express.router()
+const router = express.Router()
 
 makeUpdate({
     router: router,
@@ -144,7 +144,7 @@ const express = require('express')
 const {makeDelete} = require('mkres')
 
 const app = express()
-const router = express.router()
+const router = express.Router()
 
 makeDelete({
     router: router,
