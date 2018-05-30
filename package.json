@@ -1,6 +1,6 @@
 {
   "name": "mkres",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "abstract_crud/index.js",
   "license": "MIT",
   "repository" :
