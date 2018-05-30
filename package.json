@@ -1,8 +1,12 @@
 {
   "name": "mkres",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "abstract_crud/index.js",
   "license": "MIT",
+  "repository" :
+  { "type" : "git",
+    "url" : "https://github.com/hieunv495/mkres.git"
+  },
   "dependencies": {
     "express": "^4.16.3",
     "express-validator": "^5.2.0",
