@@ -66,7 +66,7 @@ module.exports = Model
 ## findById
 ```js
 const express = require('express')
-const {makeFindById} = require('./abstract_crud')
+const {makeFindById} = require('mkres')
 
 const app = express()
 const router = express.router()
@@ -83,7 +83,7 @@ app.use('/users',router)
 ## find
 ```js
 const express = require('express')
-const {makeFind} = require('./abstract_crud')
+const {makeFind} = require('mkres')
 
 const app = express()
 const router = express.router()
@@ -102,7 +102,7 @@ app.use('/users',router)
 ```js
 const {body} = require('express-validator/check')
 const express = require('express')
-const {makeCreate} = require('./abstract_crud')
+const {makeCreate} = require('mkres')
 
 const app = express()
 const router = express.router()
@@ -122,7 +122,7 @@ app.use('/users',router)
 ```js
 const {body} = require('express-validator/check')
 const express = require('express')
-const {makeUpdate} = require('./abstract_crud')
+const {makeUpdate} = require('mkres')
 
 const app = express()
 const router = express.router()
@@ -141,7 +141,7 @@ app.use('/users',router)
 ## delete
 ```js
 const express = require('express')
-const {makeDelete} = require('./abstract_crud')
+const {makeDelete} = require('mkres')
 
 const app = express()
 const router = express.router()
