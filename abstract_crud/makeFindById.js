@@ -1,24 +1,45 @@
-const {asyncWrapper,getSelectFields,getPopulateFields} = require('./utils')
+const {asyncWrapper} = require('./utils')
+const {getSelectFields,getPopulateFields, getWithIdParam} = require('./queryParamsGetter')
+
+const DEFAULT_PARAMS = {
+    select: undefined,
+    populate: undefined,
+    withId: false,
+}
 
 module.exports = (options) => {
 
     let {
         model,
-        router
+        router,
+        defaultParams = {}
     } = options
 
     router.get('/:id', asyncWrapper(async (req, res) => {
         
-        let selectFields = getSelectFields(req)
-        let populateFields = getPopulateFields(req)
+        let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
+        let rqq = req.query     
 
-        let getItem = model.findById(req.params.id)
+        let select = getSelectFields(req, fdp.select)
+        let populate = getPopulateFields(req,fdp.populate)
+        let withId = getWithIdParam(req,fdp.withId)
+
+        let getItem = model.findById(req.params.id).lean()
         
-        if (populateFields.length > 0) getItem = getItem.populate(populateFields);
+        if (populate.length > 0) getItem = getItem.populate(populate);
         
-        if (selectFields.length > 0) getItem = getItem.select(selectFields.join(' '));
+        if (select.length > 0) getItem = getItem.select(select.join(' '));
 
         item = await getItem
+
+        if(!item){
+            return res.status(404).json({error: 'NotFound', message: 'Not Found!'})
+        }
+
+        if(withId){
+            item.id = item._id
+            delete item._id
+        }
 
         res.json(item)
     }))

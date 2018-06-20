@@ -1,17 +1,21 @@
-const {asyncWrapper,getSelectFields,getPopulateFields} = require('./utils')
+const {asyncWrapper, withDefault} = require('./utils')
+const {getSelectFields,getPopulateFields, getWithIdParam} = require('./queryParamsGetter')
+const queryParser = require('./queryParser')
+const getPagination = require('./paginate')
 
-const getPaginationParams = (req, defaultLimit = 20) => {
-    let limit = req.query.limit ? parseInt(req.query.limit) : defaultLimit
-    let offset = req.query.offset ? parseInt(req.query.offset) : 0
-    let page = req.query.page ? parseInt(req.query.page) : 1
-    let skip = offset + limit * (page - 1)
-    return {
-        offset,
-        page,
-        skip,
-        limit
-    }
-}
+/*
+- paginate:
+    + paginate: if true then return pagination request else return list items
+    + limit
+    + offset
+    + page
+- sort
+- select
+- filter
+- middleware
+- find params
+*/
+
 
 const getFilterParams = (req) => {
     let params = []
@@ -46,9 +50,9 @@ const getFilterParams = (req) => {
     return params
 }
 
-const getSortParams = (req) => {
+const getSortParams = (req, defaultVal) => {
     let sortString = req.query.sort
-    if (!sortString) return null;
+    if (!sortString) return defaultVal;
     let sortFields = sortString.split(',').map(field => field.trim())
     return sortFields.map(field => {
         if (field.startsWith('-')) {
@@ -58,55 +62,80 @@ const getSortParams = (req) => {
     })
 }
 
+const DEFAULT_PARAMS = {
+    itemOnly : false,
+
+    paginate : true,
+    limit : 10,
+    offset: 0,
+    page: 1,
+    
+    sort: undefined,
+    select: undefined,
+    populate: undefined,
+    withId: false,
+}
 
 module.exports = (options) => {
 
     let {
         model,
+        query = {},
         router,
-        defaultLimit = 20
+        defaultParams = {},
     } = options
 
     router.get('/', asyncWrapper(async (req, res) => {
-        var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        console.log(fullUrl)
-        console.log(typeof req.query.obj)
-        let {
-            page,
-            offset,
-            skip,
-            limit
-        } = getPaginationParams(req, defaultLimit)
+        
+        let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
+        let rqq = req.query
+
+        let itemOnly = queryParser.parseBoolean(rqq.itemOnly,fdp.itemOnly)
+
+        let paginate = queryParser.parseBoolean(rqq.paginate, fdp.paginate)
+        let limit = queryParser.parseInt(rqq.limit,fdp.limit)
+        let offset = queryParser.parseInt(rqq.offset, fdp.offset)
+        let page = queryParser.parseInt(rqq.page,fdp.page)
+
+        let sort = getSortParams(req,fdp.sort)
+        let select = getSelectFields(req, fdp.select)
+        let populate = getPopulateFields(req,fdp.populate)
+        let withId = getWithIdParam(req,fdp.withId)
+        
         let filterParams = getFilterParams(req)
-        let query = {}
-        if (filterParams.length >= 1) {
-            query = {
-                $and: filterParams
+
+        let finalQuery = query
+        if (filterParams.length > 0) {
+            finalQuery = {
+                $and: [query,...filterParams]
             }
         }
-        let sortParams = getSortParams(req)
-        let selectFields = getSelectFields(req)
-        let populateFields = getPopulateFields(req)
 
-        let getItems = model.find(query).sort(sortParams).skip(skip).limit(limit)
-        
-        if (populateFields.length > 0) getItems = getItems.populate(populateFields);
-        
-        if (selectFields.length > 0) getItems = getItems.select(selectFields.join(' '));
+        if(!paginate){
+            let getItemsPromise = model.find(finalQuery).lean().sort(sort).populate(populate).select(select)
+            if(withId){
+                getItemsPromise = getItemsPromise.then(items => items.map(item => {
+                    item.id = item._id
+                    delete item._id
+                    return item
+                }))
+            }
+            let items =  await getItemsPromise
+            return res.json(items)
+        }
 
-        let getTotal = model.count(query)
-
-        let [items, total] = await Promise.all([getItems, getTotal])
-
-        let totalPages = Math.ceil((total - offset) / limit)
-
-        res.json({
+        return res.json( 
+            await getPagination(model,finalQuery,{
+            itemOnly,
+            select,
+            sort,
+            populate,
+            lean: true,
+            leanWithId: withId,
             limit,
-            page,
             offset,
-            total,
-            totalPages,
-            items
+            page
         })
+        )
     }))
 }

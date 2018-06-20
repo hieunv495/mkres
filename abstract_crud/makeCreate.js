@@ -1,13 +1,20 @@
-const {asyncWrapper,getSelectFields,getPopulateFields} = require('./utils')
+const {asyncWrapper} = require('./utils')
+const {getSelectFields,getPopulateFields, getWithIdParam} = require('./queryParamsGetter')
 const {validationResult} = require('express-validator/check')
 
+const DEFAULT_PARAMS = {
+    select: undefined,
+    populate: undefined,
+    withId: false,
+}
 
 module.exports = (options) => {
 
     let {
         model,
         router,
-        validators = []
+        validators = [],
+        defaultParams = {}
     } = options
 
     router.post('/', validators,asyncWrapper(async (req, res) => {
@@ -16,19 +23,28 @@ module.exports = (options) => {
           return res.status(422).json({message: 'Error',errors: errors.mapped()});
         }
 
+        let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
+        let rqq = req.query        
+
+        let select = getSelectFields(req, fdp.select)
+        let populate = getPopulateFields(req,fdp.populate)
+        let withId = getWithIdParam(req,fdp.withId)
+
         let data = req.body
 
         let item = await model.create(data)
 
-        let populateFields = getPopulateFields(req)
-        if(populateFields.length > 0)
-            item = await item.populate(getPopulateFields(req)).execPopulate()
+        if(populate.length > 0)
+            item = await item.populate(populate).execPopulate()
 
         let returnItem = {}
-        let selectFields = getSelectFields(req)
-        if(selectFields.length > 0)
-            selectFields.forEach(field => returnItem[field] = item[field])
-        else returnItem = item
+        if(select.length > 0)
+            select.forEach(field => returnItem[field] = item[field])
+        else returnItem = item.toJSON()
+        if(withId){
+            returnItem.id = returnItem._id
+            delete returnItem._id
+        }
 
         res.json(returnItem)
     }))

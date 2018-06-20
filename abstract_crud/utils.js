@@ -1,3 +1,5 @@
+module.exports.withDefault = (val, defaultVal) => val === undefined ? defaultVal : val
+
 module.exports.asyncWrapper = (f) => (req, res) => {
     f(req, res).catch(e => {
         console.log(e)
@@ -7,7 +9,3 @@ module.exports.asyncWrapper = (f) => (req, res) => {
         })
     })
 }
-
-module.exports.getSelectFields = (req) => req.query.select ? req.query.select.split(',') : []
-
-module.exports.getPopulateFields = (req) => req.query.populate ? req.query.populate.split(',') : []

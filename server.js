@@ -21,7 +21,13 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 makeFind({
     router: app,
     model: User,
-    defaultLimit: 10
+    defaultParams: {
+        // paginate: false,
+        // limit: 2,
+        // select: 'username',
+        // withId: true,
+        populate: 'address addresses'
+    }
 })
 makeFindById({
     router: app,
@@ -36,7 +42,10 @@ makeCreate({
     model: User,
     validators: [
         body('username').not().isEmpty().withMessage('Kkong duoc de trong')
-    ]
+    ],
+    defaultParams: {
+        populate: 'address'
+    }
 })
 makeUpdate({
     router: app,
@@ -70,7 +79,7 @@ const seedData = async ()=>{
     }
 
     for(let i =0; i < 10; i ++ ){
-        User.create({
+        await User.create({
             username:  i,
             firstName: i % 2,
             age: i,
@@ -78,6 +87,10 @@ const seedData = async ()=>{
             addresses: multiRand(100,2).map(value => listAddress[value])
         })
     }
+
+    let users = await User.find().select(['_id','username'])
+    console.log(users)
+
 }
 
 seedData()
