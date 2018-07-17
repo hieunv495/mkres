@@ -3,8 +3,6 @@ const {getSelectFields,getPopulateFields, getWithIdParam, getFilterParams, getSo
 const queryParser = require('./queryParser')
 const getPagination = require('./paginate')
 
-const select_parser = require('./parser/select_parser')
-
 /*
 - paginate: done
     + paginate: if true then return pagination request else return list items
@@ -44,9 +42,6 @@ module.exports = (options) => {
 
     router.get('/', middleware, asyncWrapper(async (req, res) => {
         
-        let selectParams = select_parser.parse(req.query.select2)
-        console.log(JSON.stringify(selectParams,null,4))
-
         let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
         let rqq = req.query
 
@@ -84,7 +79,8 @@ module.exports = (options) => {
             return res.json(items)
         }
 
-        let data = await getPagination(model,finalQuery,{
+        return res.json( 
+            await getPagination(model,finalQuery,{
             itemOnly,
             select,
             sort,
@@ -95,7 +91,6 @@ module.exports = (options) => {
             offset,
             page
         })
-
-        return res.json(data)
+        )
     }))
 }

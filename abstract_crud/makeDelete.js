@@ -4,10 +4,11 @@ module.exports = (options) => {
 
     let {
         model,
-        router
+        router,
+        middleware = []
     } = options
 
-    router.delete('/:id', asyncWrapper(async (req, res) => {
+    router.delete('/:id', middleware, asyncWrapper(async (req, res) => {
         let item = await model.findById(req.params.id)
         if(!item) return res.status(404).json({
             message: 'Not found',

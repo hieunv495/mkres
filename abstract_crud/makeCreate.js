@@ -14,10 +14,11 @@ module.exports = (options) => {
         model,
         router,
         validators = [],
-        defaultParams = {}
+        defaultParams = {},
+        middleware = []
     } = options
 
-    router.post('/', validators,asyncWrapper(async (req, res) => {
+    router.post('/',middleware, validators,asyncWrapper(async (req, res) => {
         let errors = validationResult(req);
         if (!errors.isEmpty()) {
           return res.status(422).json({message: 'Error',errors: errors.mapped()});

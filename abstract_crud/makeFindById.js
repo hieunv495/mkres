@@ -12,10 +12,11 @@ module.exports = (options) => {
     let {
         model,
         router,
-        defaultParams = {}
+        defaultParams = {},
+        middleware = []        
     } = options
 
-    router.get('/:id', asyncWrapper(async (req, res) => {
+    router.get('/:id', middleware, asyncWrapper(async (req, res) => {
         
         let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
         let rqq = req.query     
