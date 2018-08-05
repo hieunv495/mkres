@@ -2,12 +2,20 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+
+let BirthdaySchema = new Schema({
+  date: Number,
+  month: Number,
+  year: Number
+})
+
 let UserSchema = new Schema({
   username: {
     type: String
   },
   firstName: String,
 
+  birthday: BirthdaySchema,
   age: Number,
 
   address: {

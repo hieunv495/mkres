@@ -9,3 +9,11 @@ module.exports.asyncWrapper = (f) => (req, res) => {
         })
     })
 }
+
+module.exports.getMongoSelect = (model,selectData) => {
+    console.log(model.schema.paths.address.options.ref)
+}
+
+module.exports.getMongoPopulate = (model,selectData) => {
+
+}

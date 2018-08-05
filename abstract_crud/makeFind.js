@@ -1,4 +1,4 @@
-const {asyncWrapper, withDefault} = require('./utils')
+const {asyncWrapper, withDefault,getMongoSelect,getMongoPopulate} = require('./utils')
 const {getSelectFields,getPopulateFields, getWithIdParam, getFilterParams, getSortParams} = require('./queryParamsGetter')
 const queryParser = require('./queryParser')
 const getPagination = require('./paginate')
@@ -44,8 +44,13 @@ module.exports = (options) => {
 
     router.get('/', middleware, asyncWrapper(async (req, res) => {
         
-        let selectParams = select_parser.parse(req.query.select2)
-        console.log(JSON.stringify(selectParams,null,4))
+
+        let selectData =req.query.select? select_parser.parse(req.query.select) : null
+        console.log(JSON.stringify(selectData,null,4))
+
+        let mongoSelect = getMongoSelect(model,selectData)
+
+        console.log(mongoSelect)
 
         let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
         let rqq = req.query

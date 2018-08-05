@@ -82,6 +82,11 @@ const seedData = async ()=>{
         await User.create({
             username:  i,
             firstName: i % 2,
+            birthday: {
+                date: i,
+                month: i,
+                year: i
+            },
             age: i,
             address: listAddress[rand(100)],
             addresses: multiRand(100,2).map(value => listAddress[value])

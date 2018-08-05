@@ -15,24 +15,19 @@ value_separator = ws "," ws
 ws "whitespace" = [ \t\n\r]*
 
 field
-	= added_field
-    / removed_field
+	= removed_field
     / default_field
     
 select_fields 
 	= begin_object fields:fields end_object { return fields}
     / begin_object end_object { return undefined}
 
-added_field = plus field:default_field { field.type = "add"; return field }
 removed_field = minus name:field_name { return {type: "remove", name}}
 
 default_field 
-	= name:field_name select:select_fields paging:paging { return {name,select, paging } }
-    / name:field_name select:select_fields range:range { return {name,select, range } }
-	/ name:field_name paging:paging select:select_fields { return {name, select, paging} }
+	= name:field_name select:select_fields range:range { return {name,select, range } }
     / name:field_name range:range select:select_fields { return {name, select, range} }
     / name:field_name select:select_fields { return {name, select} } 
-    / name:field_name paging:paging { return {name, paging}}
     / name:field_name range:range { return {name, range}}
     / name:field_name {return {name}}
 
