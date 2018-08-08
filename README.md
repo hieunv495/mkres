@@ -5,6 +5,33 @@
 
 Best way create Restful API in express
 
+
+# Smart Select Attribute
+
+```js
+const {parseSelect} = require('mkres')
+const User = require('mongoose').model('User')
+
+let {select,populate} = parseSelect(User, 'user,address{street,city}')
+let users = User.find({}).select(select).pupulate(populate)
+
+console.logs('>> Users: ', users)
+
+```
+
+# Smart Find
+
+```js
+const {parseFind} = require('mkres')
+const User = require('mongoose').model('User')
+
+let findQuery = parseFind('age <= 3 or (age >=5 and age <9)')
+let users = User.find(findQuery)
+
+console.logs('>> Users: ', users)
+
+```
+
 # Ussage
 
 ## Prepare model
@@ -83,7 +110,7 @@ app.use('/users',router)
 
 Use 
 ```
-GET /users/?select=username,age,-_id&populate=address,addresses
+GET /users/?select=-_id,username,address{city},address{street}
 ```
 
 ## find
@@ -106,19 +133,18 @@ app.use('/users',router)
 
 Use 
 ```
-GET /users/?limit=10&offset=0&page=1&select=username,age&populate=address&f_username=hehe&fgt_age=2&flt_age=6&
+GET /users/?limit=10&offset=0&page=1&select=username,address{city}&find=(age>=1 and age<=3>) or (age > 5) 
 ```
 
 Filter: 
-* f : Equal
-* feq : Equal
-* fne : Not equal
-* fgt : Great than
-* fgte : Great than equal
-* flt : Less than
-* flte : Less than equal
-* fin : In list. Example:  fin=1,2,3
-* fnin: Not in list. Example: fnin=1,2,3
+* = : Equal
+* != : Not equal
+* > : Great than
+* >= : Great than equal
+* < : Less than
+* <= : Less than equal
+* in : In list. Example:  fin=1,2,3
+* nin: Not in list. Example: fnin=1,2,3
 
 ## create
 ```js
@@ -142,7 +168,7 @@ app.use('/users',router)
 
 Use 
 ```
-Post /users/?select=username,age,-_id&populate=address,addresses
+Post /users/?select=username,age,-_id
 ```
 
 ## update
@@ -167,7 +193,7 @@ app.use('/users',router)
 
 Use 
 ```
-PUT /users/:id?select=username,age,-_id&populate=address,addresses
+PUT /users/:id?select=username,age,-_id
 ```
 
 ## delete

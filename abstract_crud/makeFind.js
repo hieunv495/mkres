@@ -1,5 +1,12 @@
-const {asyncWrapper, withDefault, parseSelect} = require('./utils')
-const {getSelectFields,getPopulateFields, getWithIdParam, getFilterParams, getSortParams} = require('./queryParamsGetter')
+const {
+    asyncWrapper,
+    parseSelect,
+    parseFind
+} = require('./utils')
+const {
+    getWithIdParam,
+    getSortParams
+} = require('./queryParamsGetter')
 const queryParser = require('./queryParser')
 const getPagination = require('./paginate')
 
@@ -19,13 +26,13 @@ const select_parser = require('./parser/select_parser')
 */
 
 const DEFAULT_PARAMS = {
-    itemOnly : false,
+    itemOnly: false,
 
-    paginate : true,
-    limit : 10,
+    paginate: true,
+    limit: 10,
     offset: 0,
     page: 1,
-    
+
     sort: undefined,
     select: undefined,
     populate: undefined,
@@ -43,50 +50,48 @@ module.exports = (options) => {
     } = options
 
     router.get('/', middleware, asyncWrapper(async (req, res) => {
-        
-        let {select,populate} = parseSelect(model,req.query.select)
+
+        let {
+            select,
+            populate
+        } = parseSelect(model, req.query.select)
 
         console.log('>> select: ', select)
         console.log('>> populate: ', populate)
-        
-        let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
+
+        let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
         let rqq = req.query
 
-        let itemOnly = queryParser.parseBoolean(rqq.itemOnly,fdp.itemOnly)
+        let itemOnly = queryParser.parseBoolean(rqq.itemOnly, fdp.itemOnly)
 
         let paginate = queryParser.parseBoolean(rqq.paginate, fdp.paginate)
-        let limit = queryParser.parseInt(rqq.limit,fdp.limit)
+        let limit = queryParser.parseInt(rqq.limit, fdp.limit)
         let offset = queryParser.parseInt(rqq.offset, fdp.offset)
-        let page = queryParser.parseInt(rqq.page,fdp.page)
+        let page = queryParser.parseInt(rqq.page, fdp.page)
 
-        let sort = getSortParams(req,fdp.sort)
-        // let select = getSelectFields(req, fdp.select)
-        // let populate = getPopulateFields(req,fdp.populate)
-        let withId = getWithIdParam(req,fdp.withId)
+        let sort = getSortParams(req, fdp.sort)
+        let withId = getWithIdParam(req, fdp.withId)
 
-        let filterParams = getFilterParams(req)
+        let findQuery = parseFind(req.query.find)
 
-        let finalQuery = query
-        if (filterParams.length > 0) {
-            finalQuery = {
-                $and: [query,...filterParams]
-            }
+        let finalQuery = {
+            $and: [query, findQuery]
         }
 
-        if(!paginate){
+        if (!paginate) {
             let getItemsPromise = model.find(finalQuery).lean().sort(sort).populate(populate).select(select)
-            if(withId){
+            if (withId) {
                 getItemsPromise = getItemsPromise.then(items => items.map(item => {
                     item.id = item._id
                     delete item._id
                     return item
                 }))
             }
-            let items =  await getItemsPromise
+            let items = await getItemsPromise
             return res.json(items)
         }
 
-        let data = await getPagination(model,finalQuery,{
+        let data = await getPagination(model, finalQuery, {
             itemOnly,
             select,
             sort,

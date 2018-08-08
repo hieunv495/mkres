@@ -1,4 +1,7 @@
 const mongoose = require('mongoose')
+const find_parser = require('./parser/find_parser.js')
+const select_parser = require('./parser/select_parser.js')
+
 
 module.exports.withDefault = (val, defaultVal) => val === undefined ? defaultVal : val
 
@@ -124,8 +127,6 @@ const parsePath = (path, data) => {
     return result
 }
 
-const select_parser = require('./parser/select_parser.js')
-
 const parseSelect = (model, text) => {
     console.log(text)
     if (!text)
@@ -153,7 +154,60 @@ const testParsePath = () => {
 
 }
 
-testParsePath()
-
+// testParsePath()
 
 module.exports.parseSelect = parseSelect
+
+
+let opMap = {
+    '=': '$eq',
+    '!=': '$ne',
+    '>': '$gt',
+    '>=': '$gte',
+    '<': '$lt',
+    '<=': '$lte',
+    in: '$in',
+    nin: '$nin',
+    '': '$eq'
+}
+
+const getMongoFindQuery = (data) => {
+
+    if (!data.type) {
+        return data
+    }
+    if (data.type == 'and') {
+        return {
+            $and: [getMongoFindQuery(data.left), getMongoFindQuery(data.right)]
+        }
+    } else if (data.type == 'or') {
+        return {
+            $or: [getMongoFindQuery(data.left), getMongoFindQuery(data.right)]
+        }
+    } else {
+        return {
+            [data.left]: {
+                [opMap[data.type]]: getMongoFindQuery(data.right)
+            }
+        }
+    }
+}
+
+module.exports.getMongoFindQuery = getMongoFindQuery
+
+const parseFind = (text) => {
+    if (!text) {
+        return {}
+    }
+    let data = find_parser.parse(text)
+    return getMongoFindQuery(data)
+}
+
+module.exports.parseFind = parseFind
+
+const testFind = () => {
+    let query = parseFind('name=10 or (age >= 10 and age <20)')
+    console.log('>> Find Query: ', JSON.stringify(query))
+}
+
+testFind()

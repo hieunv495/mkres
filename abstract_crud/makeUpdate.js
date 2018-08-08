@@ -1,6 +1,13 @@
-const {asyncWrapper} = require('./utils')
-const {getSelectFields,getPopulateFields, getWithIdParam} = require('./queryParamsGetter')
-const {validationResult} = require('express-validator/check')
+const {
+    asyncWrapper,
+    parseSelect
+} = require('./utils')
+const {
+    getWithIdParam
+} = require('./queryParamsGetter')
+const {
+    validationResult
+} = require('express-validator/check')
 
 const DEFAULT_PARAMS = {
     select: undefined,
@@ -15,39 +22,47 @@ module.exports = (options) => {
         router,
         validators = [],
         defaultParams = {},
-        middleware = []        
+        middleware = []
     } = options
 
-    router.put('/:id', middleware, validators,asyncWrapper(async (req, res) => {
+    router.put('/:id', middleware, validators, asyncWrapper(async (req, res) => {
         let errors = validationResult(req);
         if (!errors.isEmpty()) {
-          return res.status(422).json({message: 'Error',errors: errors.mapped()});
+            return res.status(422).json({
+                message: 'Error',
+                errors: errors.mapped()
+            });
         }
 
-        let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
-        let rqq = req.query   
-            
-        let select = getSelectFields(req, fdp.select)
-        let populate = getPopulateFields(req,fdp.populate)
-        let withId = getWithIdParam(req,fdp.withId)
+        let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
+        let rqq = req.query
+
+        let {
+            select,
+            populate
+        } = parseSelect(model, req.query.select)
+
+        let withId = getWithIdParam(req, fdp.withId)
 
         let data = req.body
 
         let item = await model.findById(req.params.id)
 
-        if(!item) return res.status(404).json({message: 'Not Found'})
+        if (!item) return res.status(404).json({
+            message: 'Not Found'
+        })
 
-        Object.assign(item,data)
+        Object.assign(item, data)
         item = await item.save()
 
-        if(populate.length > 0)
+        if (populate.length > 0)
             item = await item.populate(populate).execPopulate()
 
         let returnItem = {}
-        if(select.length > 0)
+        if (select.length > 0)
             select.forEach(field => returnItem[field] = item[field])
         else returnItem = item.toJSON()
-        if(withId){
+        if (withId) {
             returnItem.id = returnItem._id
             delete returnItem._id
         }

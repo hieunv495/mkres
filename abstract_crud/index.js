@@ -4,4 +4,17 @@ const makeDelete = require('./makeDelete')
 const makeCreate = require('./makeCreate')
 const makeUpdate = require('./makeUpdate')
 
-module.exports = {makeFind,makeFindById,makeDelete,makeCreate,makeUpdate}
+const {
+    parseSelect,
+    parseFind
+} = require('./utils')
+
+module.exports = {
+    parseSelect,
+    parseFind,
+    makeFind,
+    makeFindById,
+    makeDelete,
+    makeCreate,
+    makeUpdate
+}
