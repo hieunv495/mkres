@@ -158,7 +158,6 @@ const testParsePath = () => {
 
 module.exports.parseSelect = parseSelect
 
-
 let opMap = {
     '=': '$eq',
     '!=': '$ne',
@@ -210,4 +209,4 @@ const testFind = () => {
     console.log('>> Find Query: ', JSON.stringify(query))
 }
 
-testFind()
+// testFind()
