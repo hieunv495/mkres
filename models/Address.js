@@ -4,7 +4,11 @@ const Schema = mongoose.Schema
 
 let ModelSchema = new Schema({
   street: String,
-  city: String
+  city: String,
+  boss: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 

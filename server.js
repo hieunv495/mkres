@@ -94,7 +94,7 @@ const seedData = async ()=>{
     }
 
     let users = await User.find().populate(['address',{path: 'addresses',select: 'city'}])
-    console.log(users)
+    // console.log(users)
     // let  r = /((\k<item>)a)|(?<item>(\(\w+\)))/g
 
     // // let s ='firstName ,last_name ,address(name,age),addresses(name,city(name,local),sadf(),ahhi())[:10]'

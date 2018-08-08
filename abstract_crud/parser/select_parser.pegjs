@@ -20,7 +20,7 @@ field
     
 select_fields 
 	= begin_object fields:fields end_object { return fields}
-    / begin_object end_object { return undefined}
+    / begin_object end_object { return []}
 
 removed_field = minus name:field_name { return {type: "remove", name}}
 
@@ -32,7 +32,7 @@ default_field
     / name:field_name {return {name}}
 
 field_name 
-	= [a-zA-Z0-9]+ {return text()}
+	= [_a-zA-Z0-9]+ {return text()}
 
 range
 	= begin_array from:index_number name_separator to:index_number end_array {return {from: from, to: to}}
