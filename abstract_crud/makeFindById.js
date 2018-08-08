@@ -1,4 +1,4 @@
-const {asyncWrapper} = require('./utils')
+const {asyncWrapper, parseSelect} = require('./utils')
 const {getSelectFields,getPopulateFields, getWithIdParam} = require('./queryParamsGetter')
 
 const DEFAULT_PARAMS = {
@@ -21,8 +21,10 @@ module.exports = (options) => {
         let fdp = finalDefaultParams = Object.assign({},DEFAULT_PARAMS,defaultParams)
         let rqq = req.query     
 
-        let select = getSelectFields(req, fdp.select)
-        let populate = getPopulateFields(req,fdp.populate)
+        let {select,populate} = parseSelect(model,req.query.select)
+
+        // let select = getSelectFields(req, fdp.select)
+        // let populate = getPopulateFields(req,fdp.populate)
         let withId = getWithIdParam(req,fdp.withId)
 
         let getItem = model.findById(req.params.id).lean()

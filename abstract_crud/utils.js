@@ -44,6 +44,7 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.ref && childData.select && childData.select == 0) {
+                result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName
                 })
@@ -56,6 +57,7 @@ const parsePath = (path, data) => {
                     populate
                 } = parsePath(mongoose.model(childPath.options.ref), childData)
 
+                result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName,
                     select: select.length > 0 ? select : undefined,
@@ -68,6 +70,7 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.type[0] && childPath.options.type[0].ref && childData.select && childData.select == 0) {
+                result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName
                 })
@@ -80,6 +83,7 @@ const parsePath = (path, data) => {
                     populate
                 } = parsePath(mongoose.model(childPath.options.type[0].ref), childData)
 
+                result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName,
                     select: select.length > 0 ? select : undefined,
@@ -102,6 +106,7 @@ const parsePath = (path, data) => {
                         }
                         return childPathName + '.' + name
                     }))
+
                 result.populate.push(...populate.map(({
                     path,
                     select,
