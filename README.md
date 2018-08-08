@@ -189,3 +189,10 @@ Use
 ```
 DELETE /users/:id
 ```
+
+
+# Development
+
+```
+docker-compose up
+```

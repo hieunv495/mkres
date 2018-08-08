@@ -1,0 +1,17 @@
+version: "3"
+services:
+  server:
+    build: ./
+    # restart: always
+    volumes:
+      - ./:/app
+      - /data/mkres/media/images:/data/mkres/media/images
+    depends_on:
+      - mongo
+    ports:
+      - "80:80"
+
+  mongo:
+      image: mongo
+      volumes:
+        - /data/mkres/db:/data/db

@@ -6,7 +6,7 @@ const {body} = require('express-validator/check')
 
 var app = express()
 
-let mongodb = mongoose.connect('mongodb://localhost:27017/test_restful')
+let mongodb = mongoose.connect('mongodb://mongo:27017/mkres')
 
 const User = require('./models/User')
 const Address = require('./models/Address')
@@ -105,7 +105,7 @@ const seedData = async ()=>{
 
 seedData()
 
-app.listen(3000, () => {
-    console.log('Server listen on ' + 3000);
+app.listen(80, () => {
+    console.log('Server listen on ' + 80);
   })
   
