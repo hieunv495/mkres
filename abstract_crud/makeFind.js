@@ -56,8 +56,8 @@ module.exports = (options) => {
             populate
         } = parseSelect(model, req.query.select)
 
-        console.log('>> select: ', select)
-        console.log('>> populate: ', populate)
+        console.log('>> select: ', JSON.stringify(select))
+        console.log('>> populate: ', JSON.stringify(populate))
 
         let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
         let rqq = req.query
@@ -79,7 +79,7 @@ module.exports = (options) => {
         }
 
         if (!paginate) {
-            let getItemsPromise = model.find(finalQuery).lean().sort(sort).populate(populate).select(select)
+            let getItemsPromise = model.find(finalQuery).sort(sort).populate(populate).select(select)
             if (withId) {
                 getItemsPromise = getItemsPromise.then(items => items.map(item => {
                     item.id = item._id
@@ -96,7 +96,6 @@ module.exports = (options) => {
             select,
             sort,
             populate,
-            lean: true,
             leanWithId: withId,
             limit,
             offset,

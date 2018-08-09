@@ -33,7 +33,7 @@ module.exports = (options) => {
 
         let withId = getWithIdParam(req, fdp.withId)
 
-        let getItem = model.findById(req.params.id).lean()
+        let getItem = model.findById(req.params.id)
 
         if (populate.length > 0) getItem = getItem.populate(populate);
 

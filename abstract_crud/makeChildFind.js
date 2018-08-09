@@ -67,7 +67,7 @@ module.exports = (options) => {
         }
 
         if(!paginate){
-            let getItemsPromise = model.find(finalQuery).lean().sort(sort).populate(populate).select(select)
+            let getItemsPromise = model.find(finalQuery).sort(sort).populate(populate).select(select)
             if(withId){
                 getItemsPromise = getItemsPromise.then(items => items.map(item => {
                     item.id = item._id
@@ -85,7 +85,6 @@ module.exports = (options) => {
             select,
             sort,
             populate,
-            lean: true,
             leanWithId: withId,
             limit,
             offset,

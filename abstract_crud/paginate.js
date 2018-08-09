@@ -3,7 +3,6 @@ const paginate = async (model, queryCriterias, {
     select = undefined,
     sort = undefined,
     populate = undefined,
-    lean = false,
     leanWithId = false,
     limit = 10,
     offset = 0,
@@ -11,9 +10,9 @@ const paginate = async (model, queryCriterias, {
 }) => {
 
     let skip = offset + limit * (page - 1)
-    let getItemsPromise = model.find(queryCriterias).lean(lean).sort(sort).skip(skip).limit(limit).populate(populate).select(select)
+    let getItemsPromise = model.find(queryCriterias).sort(sort).skip(skip).limit(limit).populate(populate).select(select)
 
-    if (lean && leanWithId) {
+    if (leanWithId) {
         getItemsPromise = getItemsPromise.then(items => items.map(item => {
             item.id = item._id
             delete item._id
