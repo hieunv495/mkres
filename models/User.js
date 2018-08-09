@@ -16,6 +16,7 @@ let UserSchema = new Schema({
   firstName: String,
 
   birthday: BirthdaySchema,
+  birthdays: [BirthdaySchema],
   age: Number,
 
   address: {

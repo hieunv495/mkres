@@ -17,6 +17,21 @@ const {makeFind,makeFindById,makeDelete,makeCreate,makeUpdate} = require('./abst
 app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 
+let router = express.Router()
+
+router.get('/test',(req,res)=>{
+    Address.find({}).populate('users').then(data =>{
+        res.json(data)
+    })
+})
+
+makeFind({
+    router,
+    model: Address
+})
+
+app.use('/address',router)
+
 
 makeFind({
     router: app,
@@ -55,6 +70,9 @@ makeUpdate({
     ]
 })
 
+
+
+
 const rand = (n) => {
     return Math.round(Math.random() * n)
 }
@@ -87,6 +105,11 @@ const seedData = async ()=>{
                 month: i,
                 year: i
             },
+            birthdays: Array(5).fill(null).map(j => ({
+                date: i + j,
+                month: i + j,
+                year: i + j
+            })),
             age: i,
             address: listAddress[rand(100)],
             addresses: multiRand(100,2).map(value => listAddress[value])

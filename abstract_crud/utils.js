@@ -33,8 +33,24 @@ const parsePath = (path, data) => {
             let childPath = path.schema.paths[childPathName]
 
             if (!childPath) {
-                result.select.push(childPathName)
-                return
+
+                if(path.schema.virtuals[childPathName] && path.schema.virtuals[childPathName].options && path.schema.virtuals[childPathName].options.ref){
+                    let {
+                        select,
+                        populate
+                    } = parsePath(mongoose.model(path.schema.virtuals[childPathName].options.ref), childData)
+                    
+                    result.select.push(childPathName)
+                    result.populate.push({
+                        path: childPathName,
+                        select: select.length > 0 ? select : undefined,
+                        populate: populate.length > 0 ? populate : undefined
+                    })
+                    return
+                }else{
+                    result.select.push(childPathName)
+                    return
+                }
             }
 
             if (childData.type == 'remove') {
@@ -54,7 +70,7 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.ref) {
-                console.log('>>> Ref ')
+                // console.log('>>> Ref ')
                 let {
                     select,
                     populate
@@ -80,7 +96,7 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.type[0] && childPath.options.type[0].ref) {
-                console.log('>>> Array Ref ')
+                // console.log('>>> Array Ref ')
                 let {
                     select,
                     populate
@@ -93,8 +109,10 @@ const parsePath = (path, data) => {
                     populate: populate.length > 0 ? populate : undefined
                 })
                 return
-            } else {
-                console.log('>>> Binh thuong')
+            } 
+            
+            {
+                // console.log('>>> Binh thuong')
                 let {
                     select,
                     populate
@@ -128,7 +146,7 @@ const parsePath = (path, data) => {
 }
 
 const parseSelect = (model, text) => {
-    console.log(text)
+    // console.log(text)
     if (!text)
         return {
             select: [],
@@ -149,8 +167,8 @@ const testParsePath = () => {
         populate
     } = parseSelect(User, text)
 
-    console.log('>> Select: ', JSON.stringify(select))
-    console.log('>> Populate: ', JSON.stringify(populate))
+    // console.log('>> Select: ', JSON.stringify(select))
+    // console.log('>> Populate: ', JSON.stringify(populate))
 
 }
 
@@ -206,7 +224,7 @@ module.exports.parseFind = parseFind
 
 const testFind = () => {
     let query = parseFind('name=10 or (age >= 10 and age <20)')
-    console.log('>> Find Query: ', JSON.stringify(query))
+    // console.log('>> Find Query: ', JSON.stringify(query))
 }
 
 // testFind()

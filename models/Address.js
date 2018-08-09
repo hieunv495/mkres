@@ -9,8 +9,21 @@ let ModelSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   }
+},{
+  toJSON: {
+    virtuals: true
+  },
+  toObject: {
+    virtuals: true
+  } 
 })
 
+ModelSchema.virtual('users',{
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'address',
+  justOne: false
+})
 
 const Model = mongoose.model('Address', ModelSchema)
 module.exports = Model
