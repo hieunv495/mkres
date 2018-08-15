@@ -74,7 +74,7 @@ module.exports = User
 
 ```
 
-Address
+### Address
 ```js
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
@@ -108,7 +108,7 @@ app.use('/users',router)
 ```
 
 
-Use 
+#### Use 
 ```
 GET /users/?select=-_id,username,address{city},address{street}
 ```
@@ -131,20 +131,17 @@ app.use('/users',router)
 
 ```
 
-Use 
+#### Use 
 ```
 GET /users/?limit=10&offset=0&page=1&select=username,address{city}&find=(age>=1 and age<=3>) or (age > 5) 
 ```
 
-Filter: 
-* = : Equal
-* != : Not equal
-* > : Great than
-* >= : Great than equal
-* < : Less than
-* <= : Less than equal
-* in : In list. Example:  fin=1,2,3
-* nin: Not in list. Example: fnin=1,2,3
+Params:
+* **limit**: size of one page
+* **offset**: offset of first item
+* **select**: select option, return only declared field
+* **extra**: return extra declared field, ( use when you want populate some field but select all field)
+* **find**: simple condition for find item in mongo 
 
 ## create
 ```js
@@ -171,6 +168,10 @@ Use
 Post /users/?select=username,age,-_id
 ```
 
+Params:
+* **select**: select option, return only declared field
+* **extra**: return extra declared field, ( use when you want populate some field but select all field)
+
 ## update
 ```js
 const {body} = require('express-validator/check')
@@ -191,10 +192,14 @@ makeUpdate({
 app.use('/users',router)
 ```
 
-Use 
+#### Use 
 ```
 PUT /users/:id?select=username,age,-_id
 ```
+
+Params:
+* **select**: select option, return only declared field
+* **extra**: return extra declared field, ( use when you want populate some field but select all field)
 
 ## delete
 ```js
@@ -211,7 +216,7 @@ makeDelete({
 
 app.use('/users',router)
 ```
-Use 
+#### Use 
 ```
 DELETE /users/:id
 ```

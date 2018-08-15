@@ -37,10 +37,11 @@ module.exports = (options) => {
         let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
         let rqq = req.query
 
-        let {
-            select,
-            populate
-        } = parseSelect(model, req.query.select)
+        let selectData = parseSelect(model, req.query.select)
+        let extraData = parseSelect(model, req.query.extra)
+
+        let select = selectData.select
+        let populate = [...selectData.populate, ...extraData.populate]
 
         let withId = getWithIdParam(req, fdp.withId)
 

@@ -51,10 +51,11 @@ module.exports = (options) => {
 
     router.get('/', middleware, asyncWrapper(async (req, res) => {
 
-        let {
-            select,
-            populate
-        } = parseSelect(model, req.query.select)
+        let selectData = parseSelect(model, req.query.select)
+        let extraData = parseSelect(model, req.query.extra)
+
+        let select = selectData.select
+        let populate = [...selectData.populate, ...extraData.populate]
 
         console.log('>> select: ', JSON.stringify(select))
         console.log('>> populate: ', JSON.stringify(populate))
