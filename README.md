@@ -113,6 +113,10 @@ app.use('/users',router)
 GET /users/?select=-_id,username,address{city},address{street}
 ```
 
+Params:
+* **select**: select option, return only declared field
+* **extra**: return extra declared field, ( use when you want populate some field but select all field)
+
 ## find
 ```js
 const express = require('express')
@@ -142,6 +146,7 @@ Params:
 * **select**: select option, return only declared field
 * **extra**: return extra declared field, ( use when you want populate some field but select all field)
 * **find**: simple condition for find item in mongo 
+* **one** : return one item
 
 ## create
 ```js

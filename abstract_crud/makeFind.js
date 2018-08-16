@@ -73,10 +73,17 @@ module.exports = (options) => {
         let sort = getSortParams(req, fdp.sort)
         let withId = getWithIdParam(req, fdp.withId)
 
+        let one = queryParser.parseBoolean(req.query.one)
+
         let findQuery = parseFind(req.query.find)
 
         let finalQuery = {
             $and: [query, findQuery]
+        }
+
+        if (one) {
+            let item = await model.findOne(finalQuery).populate(populate).select(select)
+            return res.json(item)
         }
 
         if (!paginate) {
