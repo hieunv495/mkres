@@ -1,6 +1,6 @@
 {
   "name": "mkres",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "abstract_crud/index.js",
   "scripts": {
     "start": "nodemon server.js"

@@ -83,6 +83,11 @@ module.exports = (options) => {
 
         if (one) {
             let item = await model.findOne(finalQuery).populate(populate).select(select)
+            if (!item) {
+                return res.status(404).json({
+                    message: 'NotFound'
+                })
+            }
             return res.json(item)
         }
 
