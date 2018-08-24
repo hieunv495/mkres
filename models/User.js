@@ -1,9 +1,12 @@
-
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 
 let BirthdaySchema = new Schema({
+  address: {
+    type: Schema.Types.ObjectId,
+    ref: 'Address'
+  },
   date: Number,
   month: Number,
   year: Number
@@ -24,12 +27,10 @@ let UserSchema = new Schema({
     ref: 'Address'
   },
 
-  addresses: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Address'
-    }
-  ]
+  addresses: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Address'
+  }]
 
 }, {
   timestamps: {

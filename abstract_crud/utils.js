@@ -88,7 +88,7 @@ const parsePath = (path, data) => {
                 result.select.push(childPathName)
                 return
             }
-            if (childPath.options.type[0] && childPath.options.type[0].ref && childData.select && childData.select == 0) {
+            if (childPath.options.type[0] && childPath.options.type[0].ref && childData.select && childData.select.length == 0) {
                 result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName
@@ -127,6 +127,7 @@ const parsePath = (path, data) => {
                         }
                         return childPathName + '.' + name
                     }))
+                console.log('>> populate ', populate)
 
                 result.populate.push(...populate.map(({
                     path,
@@ -134,14 +135,14 @@ const parsePath = (path, data) => {
                     populate
                 }) => ({
                     path: childPathName + '.' + path,
-                    select: select.length > 0 ? select : undefined,
-                    populate: populate.length > 0 ? populate : undefined
+                    select: select && select.length > 0 ? select : undefined,
+                    populate: populate && populate.length > 0 ? populate : undefined
                 })))
             }
 
         })
     }
-
+    // console.log(result)
     return result
 }
 

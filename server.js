@@ -88,6 +88,7 @@ const seedData = async ()=>{
 
     let listAddress = []
 
+
     for(let i =0; i< 100; i++){
         let address = await Address.create({
             city: i,
@@ -103,12 +104,14 @@ const seedData = async ()=>{
             birthday: {
                 date: i,
                 month: i,
-                year: i
+                year: i,
+                address: listAddress[rand(100)]
             },
             birthdays: Array(5).fill(null).map(j => ({
                 date: i + j,
                 month: i + j,
-                year: i + j
+                year: i + j,
+                address: listAddress[rand(100)]
             })),
             age: i,
             address: listAddress[rand(100)],
