@@ -12,6 +12,8 @@ const getPagination = require('./paginate')
 
 const select_parser = require('./parser/select_parser')
 
+const getFilterParams = require('./parser/getFilterParams')
+
 /*
 - paginate: done
     + paginate: if true then return pagination request else return list items
@@ -76,9 +78,14 @@ module.exports = (options) => {
         let one = queryParser.parseBoolean(req.query.one)
 
         let findQuery = parseFind(req.query.find)
+        // let findQueryList = parsef
 
+        let filterParams = getFilterParams(req)
+
+
+        console.log(findQuery,filterParams)
         let finalQuery = {
-            $and: [query, findQuery]
+            $and: [query, findQuery,...filterParams]
         }
 
         if (one) {
