@@ -59,9 +59,6 @@ module.exports = (options) => {
         let select = selectData.select
         let populate = [...selectData.populate, ...extraData.populate]
 
-        console.log('>> select: ', JSON.stringify(select))
-        console.log('>> populate: ', JSON.stringify(populate))
-
         let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
         let rqq = req.query
 
@@ -78,12 +75,9 @@ module.exports = (options) => {
         let one = queryParser.parseBoolean(req.query.one)
 
         let findQuery = parseFind(req.query.find)
-        // let findQueryList = parsef
 
         let filterParams = getFilterParams(req)
 
-
-        console.log(findQuery,filterParams)
         let finalQuery = {
             $and: [query, findQuery,...filterParams]
         }

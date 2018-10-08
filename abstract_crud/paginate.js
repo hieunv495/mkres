@@ -30,7 +30,6 @@ const paginate = async (model, queryCriterias, {
 
     let pages = Math.ceil((total - offset) / limit)
 
-    // console.log(items)
     return {
         total,
         limit,

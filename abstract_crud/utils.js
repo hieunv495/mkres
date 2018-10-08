@@ -70,7 +70,6 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.ref) {
-                // console.log('>>> Ref ')
                 let {
                     select,
                     populate
@@ -96,7 +95,6 @@ const parsePath = (path, data) => {
                 return
             }
             if (childPath.options.type[0] && childPath.options.type[0].ref) {
-                // console.log('>>> Array Ref ')
                 let {
                     select,
                     populate
@@ -112,7 +110,6 @@ const parsePath = (path, data) => {
             } 
             
             {
-                // console.log('>>> Binh thuong')
                 let {
                     select,
                     populate
@@ -127,7 +124,6 @@ const parsePath = (path, data) => {
                         }
                         return childPathName + '.' + name
                     }))
-                console.log('>> populate ', populate)
 
                 result.populate.push(...populate.map(({
                     path,
@@ -142,12 +138,10 @@ const parsePath = (path, data) => {
 
         })
     }
-    // console.log(result)
     return result
 }
 
 const parseSelect = (model, text) => {
-    // console.log(text)
     if (!text)
         return {
             select: [],
@@ -168,12 +162,9 @@ const testParsePath = () => {
         populate
     } = parseSelect(User, text)
 
-    // console.log('>> Select: ', JSON.stringify(select))
-    // console.log('>> Populate: ', JSON.stringify(populate))
 
 }
 
-// testParsePath()
 
 module.exports.parseSelect = parseSelect
 
@@ -225,7 +216,6 @@ module.exports.parseFind = parseFind
 
 const testFind = () => {
     let query = parseFind('name=10 or (age >= 10 and age <20)')
-    // console.log('>> Find Query: ', JSON.stringify(query))
 }
 
 // testFind()
