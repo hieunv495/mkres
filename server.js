@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const express = require('express')
 const bodyParser = require('body-parser')
 
+require('./abstract_crud').setMongoose(mongoose)
+
+
 const {body} = require('express-validator/check')
 
 var app = express()

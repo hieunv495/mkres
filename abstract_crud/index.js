@@ -3,6 +3,7 @@ const makeFindById = require('./makeFindById')
 const makeDelete = require('./makeDelete')
 const makeCreate = require('./makeCreate')
 const makeUpdate = require('./makeUpdate')
+const setMongoose = require('./mongooseConfig').setMongoose
 
 const {
     parseSelect,
@@ -10,6 +11,7 @@ const {
 } = require('./utils')
 
 module.exports = {
+    setMongoose,
     parseSelect,
     parseFind,
     makeFind,

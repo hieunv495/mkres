@@ -5,6 +5,12 @@
 
 Best way create Restful API in express
 
+# install
+
+```js
+const mongoose = require('mongoose')
+require('mkres').setMongoose(mongoose)
+```
 
 # Smart Select Attribute
 

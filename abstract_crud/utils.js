@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const getMongoose = require('./mongooseConfig').getMongoose
 const find_parser = require('./parser/find_parser.js')
 const select_parser = require('./parser/select_parser.js')
 
@@ -38,7 +38,7 @@ const parsePath = (path, data) => {
                     let {
                         select,
                         populate
-                    } = parsePath(mongoose.model(path.schema.virtuals[childPathName].options.ref), childData)
+                    } = parsePath(getMongoose().model(path.schema.virtuals[childPathName].options.ref), childData)
                     
                     result.select.push(childPathName)
                     result.populate.push({
@@ -73,7 +73,7 @@ const parsePath = (path, data) => {
                 let {
                     select,
                     populate
-                } = parsePath(mongoose.model(childPath.options.ref), childData)
+                } = parsePath(getMongoose().model(childPath.options.ref), childData)
 
                 result.select.push(childPathName)
                 result.populate.push({
@@ -98,7 +98,7 @@ const parsePath = (path, data) => {
                 let {
                     select,
                     populate
-                } = parsePath(mongoose.model(childPath.options.type[0].ref), childData)
+                } = parsePath(getMongoose().model(childPath.options.type[0].ref), childData)
 
                 result.select.push(childPathName)
                 result.populate.push({
