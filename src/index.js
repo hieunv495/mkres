@@ -5,10 +5,8 @@ const makeCreate = require('./makeCreate')
 const makeUpdate = require('./makeUpdate')
 const setMongoose = require('./mongooseConfig').setMongoose
 
-const {
-    parseSelect,
-    parseFind
-} = require('./utils')
+const parseSelect = require('./parser/parseSelect') 
+const parseFind = require('./parser/parseFind') 
 
 module.exports = {
     setMongoose,

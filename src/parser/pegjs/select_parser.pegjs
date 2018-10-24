@@ -1,7 +1,32 @@
 // MKRES select object field parser
 
 fields
-	= head:field tail:(value_separator field:field { return field})* { return [head].concat(tail)}
+	= head:field tail:(value_separator field:field { return field})* value_separator
+    	{ 
+          let fields = [head].concat(tail)
+          if(fields.find(f=>f.spread))
+          	return {
+            	all: true,
+            	select: fields.filter(f => !f.spread )
+            }
+            
+          return {
+          	select: fields
+          }
+      	}
+    / head:field tail:(value_separator field:field { return field})* 
+    	{
+   		let fields = [head].concat(tail)
+          if(fields.find(f=>f.spread))
+          	return {
+            	all: true,
+            	select: fields.filter(f => !f.spread)
+            }
+            
+          return {
+          	select: fields
+          }
+    	}
     
 begin_array     = ws "[" ws
 begin_object    = ws "{" ws
@@ -11,6 +36,7 @@ begin_round		= ws "(" ws
 end_round		= ws ")" ws
 name_separator  = ws ":" ws
 value_separator = ws "," ws
+spread 			= ws "..." ws
 
 ws "whitespace" = [ \t\n\r]*
 
@@ -20,16 +46,17 @@ field
     
 select_fields 
 	= begin_object fields:fields end_object { return fields}
-    / begin_object end_object { return []}
+    / begin_object end_object { return { all: true,select: []}}
 
 removed_field = minus name:field_name { return {type: "remove", name}}
 
 default_field 
-	= name:field_name select:select_fields range:range { return {name,select, range } }
-    / name:field_name range:range select:select_fields { return {name, select, range} }
-    / name:field_name select:select_fields { return {name, select} } 
+	= name:field_name fields:select_fields range:range { return {name,...fields, range } }
+    / name:field_name range:range fields:select_fields { return {name, ...fields, range} }
+    / name:field_name fields:select_fields { return {name, ...fields} } 
     / name:field_name range:range { return {name, range}}
     / name:field_name {return {name}}
+    / spread {return {spread: true}}
 
 field_name 
 	= [_a-zA-Z0-9]+ {return text()}

@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/mkres.svg) ![npm](https://img.shields.io/npm/dm/mkres.svg)](https://www.npmjs.com/package/mkres)
 
 
-Best way create Restful API in express
+Best way create Restful API in express and mongoose
 
 # install
 
@@ -18,12 +18,42 @@ require('mkres').setMongoose(mongoose)
 const {parseSelect} = require('mkres')
 const User = require('mongoose').model('User')
 
-let {select,populate} = parseSelect(User, 'user,address{street,city}')
+let {select,populate} = parseSelect(User, 'username,address{street,city,users},...')
 let users = User.find({}).select(select).pupulate(populate)
 
 console.logs('>> Users: ', users)
 
 ```
+
+## Select text format
+
+* field_1,field_2,field_n : Select declared fields
+* field_1,field_2,...: Select declared fields and all other fields in schema
+* field_1,field_2{ child_field_1, child_field2} : Populate and select child_field
+* field_1,field_2{child_field,...} : Populate and select child field and all other child fields of field_2
+* "..." : Select all other fields
+
+## Populate and Deep Populate
+
+We can populate by format:
+```
+field{} // Populate and select all child field 
+```
+or
+```
+field{f1,f2} // Populate and select declared child field
+```
+or
+```
+field{...,f1{}} // Populate and select all child field and populate child field 
+```
+
+**We can deep populate:**
+```
+field{f{ff{fff1,fff2},...}}
+```
+
+**Spread "..." is select all other fields**
 
 # Smart Find
 

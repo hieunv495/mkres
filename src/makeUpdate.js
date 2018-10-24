@@ -1,7 +1,9 @@
 const {
-    asyncWrapper,
-    parseSelect
+    asyncWrapper
 } = require('./utils')
+
+const parseSelect = require('./parser/parseSelect')
+
 const {
     getWithIdParam
 } = require('./queryParamsGetter')
@@ -25,7 +27,7 @@ module.exports = (options) => {
         middleware = []
     } = options
 
-    router.post('/', middleware, validators, asyncWrapper(async (req, res) => {
+    router.put('/:id', middleware, validators, asyncWrapper(async (req, res) => {
         let errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(422).json({
@@ -47,7 +49,14 @@ module.exports = (options) => {
 
         let data = req.body
 
-        let item = await model.create(data)
+        let item = await model.findById(req.params.id)
+
+        if (!item) return res.status(404).json({
+            message: 'Not Found'
+        })
+
+        Object.assign(item, data)
+        item = await item.save()
 
         if (populate.length > 0)
             item = await item.populate(populate).execPopulate()

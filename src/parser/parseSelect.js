@@ -1,22 +1,7 @@
-const getMongoose = require('./mongooseConfig').getMongoose
-const find_parser = require('./parser/find_parser.js')
-const select_parser = require('./parser/select_parser.js')
-
-
-module.exports.withDefault = (val, defaultVal) => val === undefined ? defaultVal : val
-
-module.exports.asyncWrapper = (f) => (req, res) => {
-    f(req, res).catch(e => {
-        console.log(e)
-        res.status(400).json({
-            message: 'error',
-            error: e
-        })
-    })
-}
+const getMongoose = require('../mongooseConfig').getMongoose
+const select_parser = require('./pegjs/select_parser.js')
 
 const parsePath = (path, data) => {
-
 
     let result = {
         select: [],
@@ -34,20 +19,30 @@ const parsePath = (path, data) => {
 
             if (!childPath) {
 
-                if(path.schema.virtuals[childPathName] && path.schema.virtuals[childPathName].options && path.schema.virtuals[childPathName].options.ref){
+                if (path.schema.virtuals[childPathName] && path.schema.virtuals[childPathName].options && path.schema.virtuals[childPathName].options.ref) {
+                    result.select.push(childPathName)
+                    if (!childData.select)
+                        return
+
+                    if (childData.select.length === 0) {
+                        result.populate.push({
+                            path: childPathName
+                        })
+                        return
+                    }
+
                     let {
                         select,
                         populate
                     } = parsePath(getMongoose().model(path.schema.virtuals[childPathName].options.ref), childData)
-                    
-                    result.select.push(childPathName)
+
                     result.populate.push({
                         path: childPathName,
                         select: select.length > 0 ? select : undefined,
                         populate: populate.length > 0 ? populate : undefined
                     })
                     return
-                }else{
+                } else {
                     result.select.push(childPathName)
                     return
                 }
@@ -62,7 +57,7 @@ const parsePath = (path, data) => {
                 result.select.push(childPathName)
                 return
             }
-            if (childPath.options.ref && childData.select && childData.select == 0) {
+            if (childPath.options.ref && childData.select && childData.select.length === 0) {
                 result.select.push(childPathName)
                 result.populate.push({
                     path: childPathName
@@ -107,8 +102,8 @@ const parsePath = (path, data) => {
                     populate: populate.length > 0 ? populate : undefined
                 })
                 return
-            } 
-            
+            }
+
             {
                 let {
                     select,
@@ -138,8 +133,15 @@ const parsePath = (path, data) => {
 
         })
     }
+    if (data.all) {
+        return {
+            select: result.select.filter(i => i.startsWith('-')),
+            populate: result.populate
+        }
+    }
     return result
 }
+
 
 const parseSelect = (model, text) => {
     if (!text)
@@ -147,75 +149,26 @@ const parseSelect = (model, text) => {
             select: [],
             populate: []
         }
-    let data = select_parser.parse(text)
-    return parsePath(model, {
-        select: data
-    })
-}
-
-const testParsePath = () => {
-    const User = require('mongoose').model('User')
-    let text = 'username,birthday{date,year,month},address{street,adf},addresses{street,boss{name}}'
-
-    let {
-        select,
-        populate
-    } = parseSelect(User, text)
-
-
-}
-
-
-module.exports.parseSelect = parseSelect
-
-let opMap = {
-    '=': '$eq',
-    '!=': '$ne',
-    '>': '$gt',
-    '>=': '$gte',
-    '<': '$lt',
-    '<=': '$lte',
-    in: '$in',
-    nin: '$nin',
-    '': '$eq'
-}
-
-const getMongoFindQuery = (data) => {
-
-    if (!data.type) {
-        return data
+    let data
+    try {
+        data = select_parser.parse(text)
+    } catch (e) {
+        throw new Error('Select invalid')
     }
-    if (data.type == 'and') {
-        return {
-            $and: [getMongoFindQuery(data.left), getMongoFindQuery(data.right)]
-        }
-    } else if (data.type == 'or') {
-        return {
-            $or: [getMongoFindQuery(data.left), getMongoFindQuery(data.right)]
-        }
-    } else {
-        return {
-            [data.left]: {
-                [opMap[data.type]]: getMongoFindQuery(data.right)
-            }
-        }
-    }
+    return parsePath(model, data)
 }
 
-module.exports.getMongoFindQuery = getMongoFindQuery
+// const testParsePath = () => {
+//     const User = require('mongoose').model('User')
+//     let text = 'username,birthday{date,year,month},address{street,adf},addresses{street,boss{name}}'
 
-const parseFind = (text) => {
-    if (!text) {
-        return {}
-    }
-    let data = find_parser.parse(text)
-    return getMongoFindQuery(data)
-}
+//     let {
+//         select,
+//         populate
+//     } = parseSelect(User, text)
 
-module.exports.parseFind = parseFind
 
-const testFind = () => {
-    let query = parseFind('name=10 or (age >= 10 and age <20)')
-}
+// }
 
-// testFind()
+
+module.exports = parseSelect

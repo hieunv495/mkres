@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const express = require('express')
 const bodyParser = require('body-parser')
 
-require('./abstract_crud').setMongoose(mongoose)
+require('./src').setMongoose(mongoose)
 
 
 const {body} = require('express-validator/check')
@@ -13,7 +13,7 @@ let mongodb = mongoose.connect('mongodb://mongo:27017/mkres')
 
 const User = require('./models/User')
 const Address = require('./models/Address')
-const {makeFind,makeFindById,makeDelete,makeCreate,makeUpdate} = require('./abstract_crud')
+const {makeFind,makeFindById,makeDelete,makeCreate,makeUpdate} = require('./src')
 
 
 // BODY

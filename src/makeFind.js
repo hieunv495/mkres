@@ -1,16 +1,16 @@
 const {
-    asyncWrapper,
-    parseSelect,
-    parseFind
+    asyncWrapper
 } = require('./utils')
+
+const parseSelect = require('./parser/parseSelect')
+const parseFind = require('./parser/parseFind')
+
 const {
     getWithIdParam,
     getSortParams
 } = require('./queryParamsGetter')
 const queryParser = require('./queryParser')
 const getPagination = require('./paginate')
-
-const select_parser = require('./parser/select_parser')
 
 const getFilterParams = require('./parser/getFilterParams')
 
@@ -79,7 +79,7 @@ module.exports = (options) => {
         let filterParams = getFilterParams(req)
 
         let finalQuery = {
-            $and: [query, findQuery,...filterParams]
+            $and: [query, findQuery, ...filterParams]
         }
 
         if (one) {
