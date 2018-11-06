@@ -1,7 +1,7 @@
 const {
-    asyncWrapper,
-    parseSelect
+    asyncWrapper
 } = require('./utils')
+const parseSelect = require('./parser/parseSelect')
 const {
     getWithIdParam
 } = require('./queryParamsGetter')

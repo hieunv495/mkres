@@ -1,6 +1,6 @@
+const getFilterPath = require('./pegjs/getFilterPath')
 
 const getFilterParams = (req) => {
-    let params = []
 
     let opMap = {
         eq: '$eq',
@@ -14,23 +14,21 @@ const getFilterParams = (req) => {
         '': '$eq'
     }
 
-    let keys = Object.keys(req.query).filter(key => key.startsWith('f'))
+    const getByType = (type) => {
+        let query = type ? req.query['f_' + type] : req.query.f
+        let op = type ? opMap[type] : '$eq'
+        return Object.keys(query || {}).map(field => ({
+            [field]: {
+                [op]: query[field]
+            }
+        }))
+    }
 
-    keys.forEach(key => {
-        if(key === 'find'){
-            return
-        }
-        let value = req.query[key]
-        let op = key.split('_')[0].slice(1)
-        if (op === 'in' || op == 'nin') {
-            value = value.split(',')
-        }
-        let field = key.slice(op.length + 2)
-        let param = {}
-        param[field] = {}
-        param[field][opMap[op]] = value
-        params.push(param)
-    })
+    let params = []
+
+    for (let type of Object.keys(opMap)) {
+        params.push(...getByType(type))
+    }
 
     return params
 }
