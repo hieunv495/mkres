@@ -3,12 +3,12 @@ const {
 } = require('./utils')
 const queryParser = require('./queryParser')
 
-module.exports.getWithIdParam = (req, defaultVal) => {
-    return queryParser.parseBoolean(req.query.withId, defaultVal)
+module.exports.getWithIdParam = (query, defaultVal) => {
+    return queryParser.parseBoolean(query.withId, defaultVal)
 }
 
-module.exports.getSortParams = (req, defaultVal) => {
-    let sortString = req.query.sort
+module.exports.getSortParams = (query, defaultVal) => {
+    let sortString = query.sort
     if (!sortString) return defaultVal;
     let sortFields = sortString.split(',').map(field => field.trim())
     return sortFields.map(field => {

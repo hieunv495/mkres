@@ -3,6 +3,7 @@ const {withDefault} = require('./utils')
 const parser = {}
 
 parser.parseBoolean = (val, defaultVal) => {
+    if(typeof val === 'boolean') return val
     if (val === 'true' || val === 'yes' || val === '1') return true
     if (val === 'false' || val === 'no' || val === '0') return false
     return defaultVal

@@ -39,12 +39,9 @@ app.use('/address',router)
 makeFind({
     router: app,
     model: User,
-    defaultParams: {
-        // paginate: false,
-        // limit: 2,
-        // select: 'username',
-        // withId: true,
-        populate: 'address addresses'
+    defaultQuery: {
+        select: 'address{},...',
+        fgt_age: 4
     }
 })
 makeFindById({

@@ -14,73 +14,62 @@ const getPagination = require('./paginate')
 
 const getFilterParams = require('./parser/getFilterParams')
 
-/*
-- paginate: done
-    + paginate: if true then return pagination request else return list items
-    + limit
-    + offset
-    + page
-- sort: done
-- select: done
-- filter: done
-- middleware: done
-- queryCriteria: done
-*/
 
-const DEFAULT_PARAMS = {
-    itemOnly: false,
-
+const DEFAULT = {
     paginate: true,
+    paginateItemOnly: false,
     limit: 10,
     offset: 0,
     page: 1,
 
     sort: undefined,
     select: undefined,
-    populate: undefined,
     withId: false,
 }
 
 module.exports = (options) => {
 
     let {
-        model,
-        query = {},
         router,
+        model,
+        middleware = [],
+        listQuery = {}, // {} || function(req) || h
+        enableParams = '*', // '*' or ['paginate','list']
         defaultParams = {},
-        middleware = []
     } = options
 
     router.get('/', middleware, asyncWrapper(async (req, res) => {
 
-        let selectData = parseSelect(model, req.query.select)
-        let extraData = parseSelect(model, req.query.extra)
+        let query = Object.assign({}, defaultParams, req.query)
+
+        console.log(query)
+
+        let selectData = parseSelect(model, query.select)
 
         let select = selectData.select
-        let populate = [...selectData.populate, ...extraData.populate]
+        let populate = selectData.populate
 
-        let fdp = finalDefaultParams = Object.assign({}, DEFAULT_PARAMS, defaultParams)
-        let rqq = req.query
+        let paginate = queryParser.parseBoolean(query.paginate, DEFAULT.paginate)
+        let pagianteItemOnly = queryParser.parseBoolean(query.paginateItemOnly)
 
-        let itemOnly = queryParser.parseBoolean(rqq.itemOnly, fdp.itemOnly)
+        let limit = queryParser.parseInt(query.limit, DEFAULT.limit)
+        let offset = queryParser.parseInt(query.offset, DEFAULT.limit )
+        let page = queryParser.parseInt(query.page, DEFAULT.page )
 
-        let paginate = queryParser.parseBoolean(rqq.paginate, fdp.paginate)
-        let limit = queryParser.parseInt(rqq.limit, fdp.limit)
-        let offset = queryParser.parseInt(rqq.offset, fdp.offset)
-        let page = queryParser.parseInt(rqq.page, fdp.page)
+        let sort = getSortParams(query, DEFAULT.limit, DEFAULT.limi )
+        let withId = getWithIdParam(query)
 
-        let sort = getSortParams(req, fdp.sort)
-        let withId = getWithIdParam(req, fdp.withId)
+        let one = queryParser.parseBoolean(query.one)
 
-        let one = queryParser.parseBoolean(req.query.one)
+        let findQuery = parseFind(query.find)
 
-        let findQuery = parseFind(req.query.find)
-
-        let filterParams = getFilterParams(req)
+        let filterParams = getFilterParams(query)
 
         let finalQuery = {
-            $and: [query, findQuery, ...filterParams]
+            $and: [findQuery, ...filterParams]
         }
+
+        console.log(finalQuery)
 
         if (one) {
             let item = await model.findOne(finalQuery).populate(populate).select(select)
